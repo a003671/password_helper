@@ -1,32 +1,48 @@
+'''Модуль предназначен для создания рандомного пароля из символов и букв в разных регистрах.'''
+
+
+
 from secrets import choice
 from string import ascii_lowercase, ascii_uppercase, digits, ascii_letters
+from typing import Any, Literal, LiteralString
 
 
-def __letter_password(string: str) -> str:
+class LetterPassword:
     '''
-    The function takes a string of characters as input and returns a random character from the string as output.
-    '''
-    return choice(string)
-
-
-def create(counter_symbol: int) -> str:
-    '''
-    The function takes as input the number of characters used to create the password and returns the password.
-    '''
-    punctuation = '!#$%&*+-/<=>?@[^~\\'
-    counter = counter_symbol // 4
-    password = set()
+    класс по созданию буквосимольного пароля.
+    длина пароля от 4 до 10 символов;
     
-    password.update({__letter_password(ascii_lowercase) for _ in range(counter)} | 
-    {__letter_password(ascii_uppercase) for _ in range(counter)} |
-    {__letter_password(digits) for _ in range(counter)} |
-    {__letter_password(punctuation) for _ in range(counter)})
+    '''
+    __slots__: tuple[Literal['__length']] = ('__length',)
+    
+    MIN_length = 4
+    MAX_length = 10
+    
+    def __init__(self, length) -> None:
+        self.__length: Any = self.__check(length)
 
-    while len(password) < counter_symbol:
-        password.update({__letter_password(ascii_letters)})
+    def __check(self, lenght):
+        '''при инициализации проверяет количество символов, при выходе за указаные границы устанавливает минимальное значение.'''
+        return lenght if self.MIN_length <= lenght <= self.MAX_length else 4
 
-    return ''.join(password)
+    def __random_letter(self, string: str) -> str:
+        '''Функция принимает строку символов в качестве входных данных и возвращает случайный символ из этой строки в качестве выходных.'''
+        return choice(string)
 
 
-if __name__ == '__main__':
-    create()
+    def create(self) -> LiteralString:
+        '''Функция вызывает функцию random_letter, передает строку символов или букв, собирает пароль по указанной длине, возвращает пароль в виде строки.'''
+
+        punctuation = '!#$%&*+-/<=>?@[^~\\'
+        counter = self.__length // 4
+        password = set()
+        
+        password.update({self.__random_letter(ascii_lowercase) for _ in range(counter)} | 
+                        {self.__random_letter(ascii_uppercase) for _ in range(counter)} | 
+                        {self.__random_letter(digits) for _ in range(counter)} | 
+                        {self.__random_letter(punctuation) for _ in range(counter)})
+
+        while len(password) < self.__length:
+            password.update({self.__random_letter(ascii_letters)})
+
+        return ''.join(password)
